@@ -490,8 +490,7 @@
       <div class="hero-tag">Available for opportunities</div>
       <h1 class="hero-name">Arafat<br/><span class="accent">Suhail Dar</span></h1>
       <p class="hero-tagline">
-        <strong>Developer & Builder</strong> crafting digital experiences with clean code and creative flair.
-        Passionate about open-source, problem-solving, and pushing boundaries.
+        <strong>Developer & Builder</strong> — I am a <span id="typewriter" style="color:var(--cyan);font-weight:600;border-right:2px solid var(--cyan);padding-right:3px"></span>
       </p>
       <div class="hero-actions">
         <a href="#projects" class="btn-primary">
@@ -662,7 +661,11 @@
   <div class="activity-inner reveal">
     <div class="section-kicker" style="margin-bottom:24px">// contribution_graph</div>
     <div class="contrib-wrap">
-      <img src="https://github-readme-activity-graph.vercel.app/graph?username=arafat-suhail-dar&bg_color=0b1120&color=00f5d4&line=00f5d4&point=ffb703&area=true&area_color=00f5d4&hide_border=true&custom_title=Contribution+Activity" alt="Contribution Graph" loading="lazy" style="width:100%;display:block;border-radius:var(--r)" onerror="this.onerror=null;this.src='https://ghchart.rshah.org/00f5d4/arafat-suhail-dar';this.style.filter='invert(1) hue-rotate(140deg) saturate(2)';this.style.padding='24px'"/>
+      <img 
+        src="https://github-readme-activity-graph.vercel.app/graph?username=arafat-suhail-dar&bg_color=060a10&color=00f5d4&line=00f5d4&point=ffb703&area=true&area_color=00f5d4&hide_border=true&custom_title=Contribution%20Activity&theme=react-dark" 
+        alt="Contribution Graph" loading="lazy" 
+        style="width:100%;display:block;border-radius:var(--r)"
+        onerror="this.onerror=null;this.src='https://ghchart.rshah.org/00f5d4/arafat-suhail-dar';this.style.background='var(--bg2)';this.style.padding='24px';this.style.filter='sepia(1) hue-rotate(140deg) saturate(3) brightness(0.6)'"/>
     </div>
   </div>
 </section>
@@ -949,6 +952,31 @@ async function fetchGitHub(){
     document.getElementById('projects-grid').innerHTML='<p style="color:var(--muted);font-family:Space Mono,monospace;font-size:.8rem;grid-column:1/-1">Could not load repos. GitHub API rate limit may have been hit.</p>';
   }
 }
+
+// ──────────────────────────────────────────────
+// TYPEWRITER CYCLING ANIMATION
+// ──────────────────────────────────────────────
+(function(){
+  const el = document.getElementById('typewriter');
+  if(!el) return;
+  const words = ['Developer','Open Source Builder','Problem Solver','UI/UX Enthusiast','Code Artist','Web Developer','Creative Coder'];
+  let wi=0, ci=0, deleting=false;
+  const TYPE_SPEED=80, DELETE_SPEED=40, PAUSE=1800;
+  function tick(){
+    const word=words[wi];
+    if(!deleting){
+      el.textContent=word.slice(0,ci+1);
+      ci++;
+      if(ci===word.length){ deleting=true; setTimeout(tick,PAUSE); return; }
+    } else {
+      el.textContent=word.slice(0,ci-1);
+      ci--;
+      if(ci===0){ deleting=false; wi=(wi+1)%words.length; }
+    }
+    setTimeout(tick, deleting?DELETE_SPEED:TYPE_SPEED);
+  }
+  tick();
+})();
 
 fetchGitHub();
 </script>
