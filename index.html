@@ -239,11 +239,37 @@
       display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
     }
     .gh-img-card {
-      border: 1px solid var(--border); border-radius: var(--r); overflow: hidden;
-      background: var(--bg3); transition: box-shadow .2s;
+      border: 1px solid var(--border); border-radius: var(--r);
+      background: var(--bg3); transition: box-shadow .2s; overflow: hidden;
     }
     .gh-img-card:hover { box-shadow: var(--glow); }
     .gh-img-card img { width: 100%; display: block; filter: saturate(1.2); }
+    /* stats rendered card */
+    .stats-rendered-card {
+      border: 1px solid var(--border); border-radius: var(--r);
+      background: var(--bg3); transition: box-shadow .2s;
+      padding: 28px; display: flex; flex-direction: column; gap: 18px;
+    }
+    .stats-rendered-card:hover { box-shadow: var(--glow); }
+    .src-label { font-family: 'Space Mono', monospace; font-size: .68rem; color: var(--muted); letter-spacing: .12em; text-transform: uppercase; }
+    .src-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .src-cell {
+      background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
+      padding: 16px 18px;
+    }
+    .src-cell-icon { font-size: 1.1rem; margin-bottom: 6px; }
+    .src-cell-num { font-family: 'Syne', sans-serif; font-size: 1.9rem; font-weight: 800; color: #fff; letter-spacing: -.03em; }
+    .src-cell-num span { color: var(--cyan); }
+    .src-cell-label { font-size: .7rem; color: var(--muted); margin-top: 2px; font-family: 'Space Mono', monospace; }
+    .src-profile {
+      background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
+      padding: 14px 18px; display: flex; align-items: center; gap: 12px;
+    }
+    .src-avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--cyan); flex-shrink: 0; object-fit: cover; }
+    .src-name { color: #fff; font-weight: 600; font-size: .88rem; }
+    .src-since { color: var(--muted); font-size: .7rem; font-family: 'Space Mono', monospace; margin-top: 2px; }
+    .src-view { margin-left: auto; color: var(--cyan); font-size: .7rem; font-family: 'Space Mono', monospace; white-space: nowrap; flex-shrink: 0; transition: opacity .2s; }
+    .src-view:hover { opacity: .7; }
 
     /* ─── ABOUT ─── */
     #about { padding: 120px 60px; }
@@ -543,17 +569,26 @@
 </section>
 
 <!-- GitHub Stats Images -->
+
 <div class="gh-stats-wrap reveal">
-  <div class="gh-img-card" id="gh-stats-card" style="padding:28px;display:flex;flex-direction:column;justify-content:center;gap:20px;min-height:160px">
-    <div style="font-family:'Space Mono',monospace;font-size:.68rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase">GitHub Stats</div>
-    <div id="gh-stats-rendered" style="color:var(--muted);font-family:'Space Mono',monospace;font-size:.75rem">Loading...</div>
-  </div>
+  <div class="stats-rendered-card">
+    <div class="src-label">GitHub Stats</div>
+    <div class="src-grid">
+      <div class="src-cell"><div class="src-cell-icon">📦</div><div class="src-cell-num" id="src-repos">—</div><div class="src-cell-label">Public Repos</div></div>
+      <div class="src-cell"><div class="src-cell-icon">⭐</div><div class="src-cell-num" id="src-stars">—</div><div class="src-cell-label">Stars Earned</div></div>
+      <div class="src-cell"><div class="src-cell-icon">👥</div><div class="src-cell-num" id="src-followers">—</div><div class="src-cell-label">Followers</div></div>
+      <div class="src-cell"><div class="src-cell-icon">👣</div><div class="src-cell-num" id="src-following">—</div><div class="src-cell-label">Following</div></div>
+    </div>
+    <div class="src-profile">
+      <img class="src-avatar" id="src-avatar" src="" alt="avatar" onerror="this.style.display='none'"/>
+      <div><div class="src-name" id="src-name">arafat-suhail-dar</div><div class="src-since" id="src-since">Loading...</div></div>
+      <a class="src-view" href="https://github.com/arafat-suhail-dar" target="_blank">View ↗</a>
+    </div>
   </div>
   <div class="gh-img-card">
     <img src="https://streak-stats.demolab.com?user=arafat-suhail-dar&theme=tokyonight&background=0b1120&ring=00f5d4&fire=ffb703&currStreakLabel=00f5d4&sideLabels=c8d8e8&border=1a2a40&dates=5a7a9a" alt="GitHub Streak" loading="lazy" onerror="this.onerror=null;this.src='https://github-readme-streak-stats-nine-omega.vercel.app?user=arafat-suhail-dar&theme=tokyonight&background=0b1120&ring=00f5d4&fire=ffb703'"/>
   </div>
 </div>
-
 <!-- ABOUT -->
 <section id="about">
   <div class="section-header reveal">
@@ -841,37 +876,17 @@ async function fetchGitHub(){
     document.getElementById('info-joined').textContent=new Date(profile.created_at).toLocaleDateString('en-US',{year:'numeric',month:'long'});
     document.getElementById('info-location').textContent=profile.location||'🌍 Earth';
 
-    // --- Render stats card from live data
-    const statsEl=document.getElementById('gh-stats-rendered');
-    if(statsEl){
-      const joined=new Date(profile.created_at).toLocaleDateString('en-US',{year:'numeric',month:'short'});
-      statsEl.innerHTML=`
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-          ${[
-            ['📦','Public Repos',profile.public_repos],
-            ['⭐','Stars Earned','<span data-stars>—</span>'],
-            ['👥','Followers',profile.followers],
-            ['👣','Following',profile.following],
-          ].map(([icon,label,val])=>`
-            <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px 16px">
-              <div style="font-size:1.1rem;margin-bottom:6px">${icon}</div>
-              <div style="font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;color:#fff">${val}</div>
-              <div style="font-size:.68rem;color:var(--muted);margin-top:2px;letter-spacing:.04em">${label}</div>
-            </div>
-          `).join('')}
-        </div>
-        <div style="margin-top:14px;padding:12px 16px;background:var(--bg);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;gap:10px">
-          <img src="${profile.avatar_url}&s=40" style="width:36px;height:36px;border-radius:50%;border:2px solid var(--cyan)" onerror="this.style.display='none'"/>
-          <div>
-            <div style="color:#fff;font-weight:600;font-size:.85rem">${profile.name||profile.login}</div>
-            <div style="color:var(--muted);font-size:.72rem">Member since ${joined} · ${profile.public_repos} repos</div>
-          </div>
-          <a href="${profile.html_url}" target="_blank" style="margin-left:auto;color:var(--cyan);font-size:.7rem;font-family:'Space Mono',monospace">View ↗</a>
-        </div>
-      `;
-      // update stars after repos load
-      window._updateStarsInCard=function(s){ statsEl.querySelector('div[data-stars]') };
-    }
+    // --- Render stats card — populate direct IDs
+    const joined=new Date(profile.created_at).toLocaleDateString('en-US',{year:'numeric',month:'short'});
+    animCount(document.getElementById('src-repos'), profile.public_repos);
+    animCount(document.getElementById('src-followers'), profile.followers);
+    animCount(document.getElementById('src-following'), profile.following);
+    const srcAvatar=document.getElementById('src-avatar');
+    if(srcAvatar) srcAvatar.src=profile.avatar_url;
+    const srcName=document.getElementById('src-name');
+    if(srcName) srcName.textContent=profile.name||profile.login;
+    const srcSince=document.getElementById('src-since');
+    if(srcSince) srcSince.textContent=`Member since ${joined} · ${profile.public_repos} repos`;
     if(profile.blog){
       document.getElementById('info-blog').innerHTML=`<a href="${profile.blog}" target="_blank" style="color:var(--cyan)">${profile.blog} ↗</a>`;
     } else { document.getElementById('info-blog').textContent='—'; }
@@ -887,9 +902,7 @@ async function fetchGitHub(){
     repos.forEach(r=>{ totalStars+=r.stargazers_count; totalForks+=r.forks_count; });
     animCount(document.getElementById('s-stars'),totalStars);
     animCount(document.getElementById('s-forks'),totalForks);
-    // patch Stars Earned in rendered card
-    const starsCell=document.querySelector('#gh-stats-rendered span[data-stars]');
-    if(starsCell) starsCell.textContent=totalStars;
+    animCount(document.getElementById('src-stars'),totalStars);
 
     // top repos by stars → then by updated
     const sorted=[...repos].sort((a,b)=>b.stargazers_count-a.stargazers_count||new Date(b.updated_at)-new Date(a.updated_at));
