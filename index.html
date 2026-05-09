@@ -643,7 +643,9 @@
       <h2 class="section-title">Tech Across Repos</h2>
       <p style="color:var(--muted);margin-top:16px;font-size:.9rem;line-height:1.7">Languages used across all public repositories, weighted by bytes of code. A living map of what I actually write.</p>
       <div style="margin-top:32px">
-        <img src="https://github-readme-stats-sigma-five.vercel.app/api/top-langs/?username=arafat-suhail-dar&layout=compact&theme=tokyonight&bg_color=0b1120&title_color=00f5d4&text_color=c8d8e8&border_color=1a2a40&langs_count=8" alt="Top Languages" style="max-width:100%;border-radius:12px;border:1px solid var(--border)" onerror="this.onerror=null;this.src='https://github-readme-stats.vercel.app/api/top-langs/?username=arafat-suhail-dar&layout=compact&theme=tokyonight&bg_color=0b1120&title_color=00f5d4&text_color=c8d8e8&border_color=1a2a40&langs_count=8'"/>
+        <div id="langs-chart" style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:24px 28px;min-height:80px;">
+          <span style="font-family:Space Mono,monospace;font-size:.75rem;color:var(--muted)">Loading...</span>
+        </div>
       </div>
     </div>
     <div class="lang-bars reveal" id="lang-bars">
@@ -874,10 +876,31 @@ async function fetchGitHub(){
       requestAnimationFrame(()=>observer.observe(card));
     });
 
-    // --- Language bars
+    // --- Language bars + chart
     const langMap={};
     repos.forEach(r=>{ if(r.language) langMap[r.language]=(langMap[r.language]||0)+1; });
     const sorted_langs=Object.entries(langMap).sort((a,b)=>b[1]-a[1]).slice(0,8);
+
+    // Render langs-chart card (replaces dead external image)
+    const chartEl=document.getElementById('langs-chart');
+    if(chartEl && sorted_langs.length){
+      const total=sorted_langs.reduce((s,[,c])=>s+c,0);
+      const segments=sorted_langs.map(([l,c])=>({lang:l,cnt:c,pct:Math.round(c/total*100),color:langColor(l)}));
+      // Build bar strip
+      const stripHtml=segments.map(s=>`<div title="${s.lang}: ${s.pct}%" style="flex:${s.cnt};background:${s.color};height:100%;transition:flex .6s ease"></div>`).join('');
+      // Build legend
+      const legendHtml=segments.map(s=>`
+        <div style="display:flex;align-items:center;gap:7px;white-space:nowrap">
+          <div style="width:10px;height:10px;border-radius:50%;background:${s.color};flex-shrink:0"></div>
+          <span style="font-family:'Space Mono',monospace;font-size:.7rem;color:#c8d8e8">${s.lang}</span>
+          <span style="font-family:'Space Mono',monospace;font-size:.68rem;color:#5a7a9a">${s.pct}%</span>
+        </div>`).join('');
+      chartEl.innerHTML=`
+        <div style="font-family:'Space Mono',monospace;font-size:.68rem;color:#5a7a9a;letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px">Most Used Languages</div>
+        <div style="display:flex;height:10px;border-radius:100px;overflow:hidden;gap:2px;margin-bottom:20px">${stripHtml}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:12px 20px">${legendHtml}</div>
+      `;
+    }
     const max=sorted_langs[0]?.[1]||1;
     const barsEl=document.getElementById('lang-bars');
     barsEl.innerHTML='';
