@@ -237,37 +237,37 @@
     .gh-stats-wrap {
       max-width: 1200px; margin: 0 auto; padding: 0 60px 60px;
       display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+      align-items: stretch; min-height: 340px;
     }
     .gh-img-card {
       border: 1px solid var(--border); border-radius: var(--r);
       background: var(--bg3); transition: box-shadow .2s; overflow: hidden;
     }
     .gh-img-card:hover { box-shadow: var(--glow); }
-    .gh-img-card img { width: 100%; display: block; filter: saturate(1.2); }
+    .gh-img-card img { width: 100%; height: 100%; display: block; filter: saturate(1.2); }
     /* stats rendered card */
     .stats-rendered-card {
       border: 1px solid var(--border); border-radius: var(--r);
       background: var(--bg3); transition: box-shadow .2s;
-      padding: 28px; display: flex; flex-direction: column; gap: 18px;
+      padding: 28px; display: flex; flex-direction: column; gap: 16px;
     }
     .stats-rendered-card:hover { box-shadow: var(--glow); }
     .src-label { font-family: 'Space Mono', monospace; font-size: .68rem; color: var(--muted); letter-spacing: .12em; text-transform: uppercase; }
-    .src-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .src-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 10px; }
     .src-cell {
       background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
       padding: 16px 18px;
     }
-    .src-cell-icon { font-size: 1.1rem; margin-bottom: 6px; }
-    .src-cell-num { font-family: 'Syne', sans-serif; font-size: 1.9rem; font-weight: 800; color: #fff; letter-spacing: -.03em; }
-    .src-cell-num span { color: var(--cyan); }
-    .src-cell-label { font-size: .7rem; color: var(--muted); margin-top: 2px; font-family: 'Space Mono', monospace; }
+    .src-cell-icon { font-size: 1.2rem; margin-bottom: 8px; }
+    .src-cell-num { font-family: 'Syne', sans-serif; font-size: 2.2rem; font-weight: 800; color: #fff; letter-spacing: -.03em; line-height: 1; }
+    .src-cell-label { font-size: .68rem; color: var(--muted); margin-top: 6px; font-family: 'Space Mono', monospace; letter-spacing: .04em; }
     .src-profile {
       background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
-      padding: 14px 18px; display: flex; align-items: center; gap: 12px;
+      padding: 14px 18px; display: flex; align-items: center; gap: 12px; flex-shrink: 0;
     }
-    .src-avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--cyan); flex-shrink: 0; object-fit: cover; }
+    .src-avatar { width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--cyan); flex-shrink: 0; object-fit: cover; }
     .src-name { color: #fff; font-weight: 600; font-size: .88rem; }
-    .src-since { color: var(--muted); font-size: .7rem; font-family: 'Space Mono', monospace; margin-top: 2px; }
+    .src-since { color: var(--muted); font-size: .68rem; font-family: 'Space Mono', monospace; margin-top: 2px; }
     .src-view { margin-left: auto; color: var(--cyan); font-size: .7rem; font-family: 'Space Mono', monospace; white-space: nowrap; flex-shrink: 0; transition: opacity .2s; }
     .src-view:hover { opacity: .7; }
 
@@ -585,8 +585,8 @@
       <a class="src-view" href="https://github.com/arafat-suhail-dar" target="_blank">View ↗</a>
     </div>
   </div>
-  <div class="gh-img-card">
-    <img src="https://streak-stats.demolab.com?user=arafat-suhail-dar&theme=tokyonight&background=0b1120&ring=00f5d4&fire=ffb703&currStreakLabel=00f5d4&sideLabels=c8d8e8&border=1a2a40&dates=5a7a9a" alt="GitHub Streak" loading="lazy" onerror="this.onerror=null;this.src='https://github-readme-streak-stats-nine-omega.vercel.app?user=arafat-suhail-dar&theme=tokyonight&background=0b1120&ring=00f5d4&fire=ffb703'"/>
+  <div class="gh-img-card" style="position:relative;overflow:hidden;">
+    <img src="https://streak-stats.demolab.com?user=arafat-suhail-dar&theme=tokyonight&background=0b1120&ring=00f5d4&fire=ffb703&currStreakLabel=00f5d4&sideLabels=c8d8e8&border=1a2a40&dates=5a7a9a" alt="GitHub Streak" loading="lazy" style="width:100%;height:100%;object-fit:contain;display:block;padding:20px;" onerror="this.onerror=null;this.src='https://github-readme-streak-stats-nine-omega.vercel.app?user=arafat-suhail-dar&theme=tokyonight&background=0b1120&ring=00f5d4&fire=ffb703'"/>
   </div>
 </div>
 <!-- ABOUT -->
