@@ -38,20 +38,21 @@
 
     /* ─── CUSTOM CURSOR ─── */
     #cursor-dot {
-      position: fixed; top: 0; left: 0; width: 10px; height: 10px;
+      position: fixed; top: -100px; left: -100px; width: 10px; height: 10px;
       background: var(--cyan); border-radius: 50%;
       pointer-events: none; z-index: 9999;
       transform: translate(-50%,-50%);
-      transition: width .15s, height .15s, background .2s;
+      transition: width .15s, height .15s, background .2s, opacity .2s;
       mix-blend-mode: difference;
+      opacity: 0;
     }
     #cursor-ring {
-      position: fixed; top: 0; left: 0; width: 40px; height: 40px;
+      position: fixed; top: -100px; left: -100px; width: 40px; height: 40px;
       border: 1.5px solid var(--cyan); border-radius: 50%;
       pointer-events: none; z-index: 9998;
       transform: translate(-50%,-50%);
-      transition: transform .08s ease, width .2s, height .2s, border-color .2s, opacity .2s;
-      opacity: .6;
+      transition: width .2s, height .2s, border-color .2s, opacity .2s;
+      opacity: 0;
     }
     #cursor-trail {
       position: fixed; top: 0; left: 0; pointer-events: none; z-index: 9997;
@@ -59,6 +60,8 @@
     body.cursor-hover #cursor-dot { width: 16px; height: 16px; background: var(--amber); }
     body.cursor-hover #cursor-ring { width: 60px; height: 60px; border-color: var(--amber); opacity: .4; }
     body.cursor-click #cursor-dot { transform: translate(-50%,-50%) scale(1.8); }
+    body.cursor-active #cursor-dot { opacity: 1; }
+    body.cursor-active #cursor-ring { opacity: .6; }
 
     /* ─── NOISE OVERLAY ─── */
     body::before {
@@ -659,7 +662,7 @@
   <div class="activity-inner reveal">
     <div class="section-kicker" style="margin-bottom:24px">// contribution_graph</div>
     <div class="contrib-wrap">
-      <img src="https://ghchart.rshah.org/00f5d4/arafat-suhail-dar" alt="Contribution Chart" loading="lazy" style="filter:none;padding:24px;background:var(--bg2)"/>
+      <img src="https://github-readme-activity-graph.vercel.app/graph?username=arafat-suhail-dar&bg_color=0b1120&color=00f5d4&line=00f5d4&point=ffb703&area=true&area_color=00f5d4&hide_border=true&custom_title=Contribution+Activity" alt="Contribution Graph" loading="lazy" style="width:100%;display:block;border-radius:var(--r)" onerror="this.onerror=null;this.src='https://ghchart.rshah.org/00f5d4/arafat-suhail-dar';this.style.filter='invert(1) hue-rotate(140deg) saturate(2)';this.style.padding='24px'"/>
     </div>
   </div>
 </section>
@@ -711,14 +714,18 @@
 // ──────────────────────────────────────────────
 const dot  = document.getElementById('cursor-dot');
 const ring = document.getElementById('cursor-ring');
-let mx=0,my=0,rx=0,ry=0;
+let mx=window.innerWidth/2, my=window.innerHeight/2, rx=mx, ry=my;
+let cursorVisible=false;
 document.addEventListener('mousemove',e=>{
   mx=e.clientX; my=e.clientY;
   dot.style.left=mx+'px'; dot.style.top=my+'px';
+  if(!cursorVisible){ cursorVisible=true; document.body.classList.add('cursor-active'); }
 });
+document.addEventListener('mouseleave',()=>{ document.body.classList.remove('cursor-active'); cursorVisible=false; });
+document.addEventListener('mouseenter',()=>{ if(cursorVisible) document.body.classList.add('cursor-active'); });
 (function animRing(){
-  rx+=(mx-rx)*.14; ry+=(my-ry)*.14;
-  ring.style.left=rx+'px'; ring.style.top=ry+'px';
+  rx+=(mx-rx)*.12; ry+=(my-ry)*.12;
+  ring.style.left=Math.round(rx)+'px'; ring.style.top=Math.round(ry)+'px';
   requestAnimationFrame(animRing);
 })();
 document.querySelectorAll('a,button,.repo-card,.stat-card,.skill-pill,.social-link').forEach(el=>{
