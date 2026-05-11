@@ -448,21 +448,33 @@
     .lc-def{background:var(--muted)}
 
     /* RESPONSIVE */
-    @media(max-width:960px){
-      nav{padding:15px 24px}
-      .nav-links{display:none}
-      #hero{padding:110px 24px 60px}
-      .hero-inner{grid-template-columns:1fr;gap:44px}
-      #stats{padding:40px 24px}
-      .stats-grid{grid-template-columns:repeat(2,1fr)}
-      .gh-wrap{padding:0 24px 40px;grid-template-columns:1fr}
-      #about{padding:80px 24px}.about-grid{grid-template-columns:1fr;gap:44px}
-      #projects{padding:80px 24px}.proj-grid{grid-template-columns:1fr}
-      #languages{padding:80px 24px}.lang-inner{grid-template-columns:1fr}
-      #activity{padding:0 24px 80px}
-      #cta{padding:80px 24px}.form-row{grid-template-columns:1fr}
-      footer{padding:18px 24px;flex-direction:column;gap:10px;text-align:center}
-    }
+@media (max-width: 600px) {
+  /* Prevent the glow from pushing the page width */
+  .cta-glow {
+    width: 100vw;
+    height: 300px;
+    filter: blur(80px); /* Soften it since it's smaller */
+  }
+
+  /* Force the title to wrap and stay within bounds */
+  h2.cta-title {
+    font-size: clamp(2.5rem, 12vw, 4rem);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    width: 100%;
+  }
+
+  /* Ensure the form doesn't exceed the viewport padding */
+  .contact-form {
+    width: 100%;
+  }
+
+  /* Ensure sections don't leak horizontally */
+  #cta {
+    padding: 80px 20px;
+    overflow: hidden; /* This is the safety net */
+  }
+}
   </style>
 </head>
 <body>
