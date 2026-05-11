@@ -11,197 +11,520 @@
   <style>
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
     :root{
-      --bg:#080808; --bg2:#0f0f0f; --bg3:#161616; --bg4:#1c1c1c;
-      --orange:#ff4500; --orange2:#ff6b00; --red:#e8001d;
-      --white:#f2ede8; --text:#bdb8b2; --muted:#4e4a46;
+      --bg:#080808;
+      --bg2:#0f0f0f;
+      --bg3:#161616;
+      --bg4:#1c1c1c;
+      --orange:#ff4500;
+      --orange2:#ff6b00;
+      --red:#e8001d;
+      --white:#f2ede8;
+      --text:#bdb8b2;
+      --muted:#4e4a46;
       --border:rgba(255,69,0,0.12);
       --glow:0 0 40px rgba(255,69,0,0.35);
       --glow-sm:0 0 16px rgba(255,69,0,0.25);
+      --r:3px;
       --transition:cubic-bezier(0.25,0.46,0.45,0.94);
       --spring:cubic-bezier(0.34,1.56,0.64,1);
     }
-    html{scroll-behavior:smooth; overflow-x: hidden;}
+    html{scroll-behavior:smooth}
     body{
-      background:var(--bg); color:var(--text);
-      font-family:'Inter',sans-serif; overflow-x:hidden;
-      cursor:none; -webkit-font-smoothing:antialiased;
-      width: 100%;
+      background:var(--bg);
+      color:var(--text);
+      font-family:'Inter',sans-serif;
+      overflow-x:hidden;
+      cursor:none;
+      -webkit-font-smoothing:antialiased;
     }
     ::selection{background:rgba(255,69,0,0.28);color:#fff}
     a{color:inherit;text-decoration:none}
 
-    /* CURSOR */
-    #cur-dot, #cur-ring{position:fixed; top:-50px; left:-50px; pointer-events:none; z-index:9999; transform:translate(-50%,-50%); opacity:0; transition: opacity .3s;}
-    #cur-dot{width:6px; height:6px; background:var(--orange); border-radius:50%;}
-    #cur-ring{width:34px; height:34px; border:1.5px solid rgba(255,69,0,0.6); border-radius:50%; transition: width .25s var(--transition), height .25s var(--transition), opacity .3s;}
-    body.c-on #cur-dot, body.c-on #cur-ring{opacity:1}
-    body.c-hover #cur-dot{width:12px; height:12px; background:var(--white)}
-    body.c-hover #cur-ring{width:48px; height:48px;}
+    /* ── CUSTOM CURSOR ── */
+    #cur-dot{
+      position:fixed;top:-50px;left:-50px;
+      width:6px;height:6px;
+      background:var(--orange);border-radius:50%;
+      pointer-events:none;z-index:9999;
+      transform:translate(-50%,-50%);
+      transition:width .18s var(--transition),height .18s var(--transition),background .2s,opacity .3s;
+      opacity:0;
+    }
+    #cur-ring{
+      position:fixed;top:-50px;left:-50px;
+      width:34px;height:34px;
+      border:1.5px solid rgba(255,69,0,0.6);border-radius:50%;
+      pointer-events:none;z-index:9998;
+      transform:translate(-50%,-50%);
+      transition:width .25s var(--transition),height .25s var(--transition),border-color .2s,opacity .3s;
+      opacity:0;
+    }
+    body.c-on #cur-dot{opacity:1}
+    body.c-on #cur-ring{opacity:1}
+    body.c-hover #cur-dot{width:12px;height:12px;background:var(--white)}
+    body.c-hover #cur-ring{width:48px;height:48px;border-color:rgba(255,69,0,0.4)}
+    body.c-click #cur-dot{transform:translate(-50%,-50%) scale(1.6)}
 
-    /* NOISE & SCROLL */
-    body::after{content:''; position:fixed; inset:0; z-index:0; pointer-events:none; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"); opacity:.55;}
-    #scrollbar{position:fixed; top:0; left:0; height:2px; z-index:9000; background:linear-gradient(90deg,var(--red),var(--orange),var(--orange2)); width:0%;}
+    /* ── NOISE ── */
+    body::after{
+      content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      background-size:160px;opacity:.55;
+    }
 
-    /* NAV */
-    nav{position:fixed; top:0; left:0; right:0; z-index:800; display:flex; align-items:center; justify-content:space-between; padding:20px 64px; background:rgba(8,8,8,0.8); backdrop-filter:blur(24px); border-bottom:1px solid rgba(255,69,0,0.06); transition: .4s var(--transition);}
-    nav.scrolled{padding:12px 64px; background:rgba(8,8,8,0.95)}
-    .nav-logo{font-family:'Syne',sans-serif; font-size:1.5rem; color:var(--white);}
+    /* ── SCROLL BAR ── */
+    #scrollbar{
+      position:fixed;top:0;left:0;height:2px;z-index:9000;
+      background:linear-gradient(90deg,var(--red),var(--orange),var(--orange2));
+      transition:width .06s linear;width:0%;
+    }
+
+    /* ── NAV ── */
+    nav{
+      position:fixed;top:0;left:0;right:0;z-index:800;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:20px 64px;
+      background:rgba(8,8,8,0.8);
+      backdrop-filter:blur(24px) saturate(1.4);
+      border-bottom:1px solid rgba(255,69,0,0.06);
+      transition:padding .4s var(--transition),background .3s;
+    }
+    nav.scrolled{padding:12px 64px;background:rgba(8,8,8,0.95)}
+    .nav-logo{
+      font-family:'Syne',sans-serif;
+      font-size:1.5rem;letter-spacing:.05em;color:var(--white);
+    }
     .nav-logo span{color:var(--orange)}
-    .nav-links{display:flex; gap:32px; list-style:none}
-    .nav-links a{font-family:'Space Mono',monospace; font-size:.7rem; color:var(--muted); text-transform:uppercase; transition: .25s;}
+    .nav-links{display:flex;gap:32px;list-style:none}
+    .nav-links a{
+      font-family:'Space Mono',monospace;font-size:.7rem;
+      color:var(--muted);letter-spacing:.12em;text-transform:uppercase;
+      transition:color .25s;position:relative;padding-bottom:3px;
+    }
+    .nav-links a::after{
+      content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
+      background:var(--orange);transform:scaleX(0);transform-origin:left;
+      transition:transform .3s var(--transition);
+    }
     .nav-links a:hover{color:var(--orange)}
-    .nav-cta{font-family:'Space Mono',monospace; font-size:.7rem; padding:9px 20px; border:1px solid var(--orange); color:var(--orange); border-radius:2px; transition: .25s;}
-    .nav-cta:hover{background:var(--orange); color:#000; box-shadow:var(--glow-sm);}
+    .nav-links a:hover::after{transform:scaleX(1)}
+    .nav-cta{
+      font-family:'Space Mono',monospace;font-size:.7rem;
+      padding:9px 20px;border:1px solid var(--orange);
+      color:var(--orange);border-radius:2px;letter-spacing:.06em;
+      transition:background .25s,color .25s,box-shadow .25s,transform .2s;
+    }
+    .nav-cta:hover{background:var(--orange);color:#000;box-shadow:var(--glow-sm);transform:translateY(-1px)}
 
-    /* HERO */
-    section{position:relative; z-index:1; width: 100%;}
-    #hero{min-height:100vh; display:flex; align-items:center; padding:140px 64px 80px;}
-    .hero-inner{max-width:1240px; margin:auto; width:100%; display:grid; grid-template-columns:1.1fr 0.9fr; gap:72px; align-items:center}
-    h1.hero-name{font-family:'Syne',sans-serif; font-size:clamp(4.5rem,9vw,9.5rem); line-height:.92; color:var(--white);}
-    h1.hero-name .line-orange{display:block; color:var(--orange); text-shadow:0 0 60px rgba(255,69,0,0.3);}
-    h1.hero-name .line-outline{-webkit-text-stroke:1.5px rgba(255,69,0,0.35); color:transparent;}
-    .hero-desc{margin-top:22px; font-size:.95rem; color:var(--muted); line-height:1.85; max-width:420px;}
-    .hero-actions{display:flex; gap:14px; margin-top:38px; flex-wrap:wrap;}
-    .btn-primary, .btn-secondary{display:inline-flex; align-items:center; gap:9px; padding:13px 30px; font-family:'Space Mono',monospace; font-size:.76rem; font-weight:700; border-radius:2px; transition: .25s var(--spring);}
-    .btn-primary{background:var(--orange); color:#000;}
-    .btn-primary:hover{background:var(--orange2); box-shadow:var(--glow); transform:translateY(-3px)}
-    .btn-secondary{border:1px solid rgba(255,69,0,0.28); color:var(--text);}
-    .btn-secondary:hover{border-color:var(--orange); color:var(--orange); transform:translateY(-3px)}
+    /* ── SECTION BASE ── */
+    section{position:relative;z-index:1}
 
-    /* TERMINAL */
-    .terminal{background:var(--bg2); border:1px solid rgba(255,69,0,0.18); border-radius:8px; overflow:hidden; box-shadow:0 40px 100px rgba(0,0,0,.65),var(--glow);}
-    .terminal-bar{display:flex; align-items:center; gap:8px; padding:13px 16px; background:rgba(0,0,0,.55); border-bottom:1px solid rgba(255,69,0,0.1);}
-    .dot{width:11px; height:11px; border-radius:50%}.dot.r{background:#ff5f57}.dot.y{background:#ffbd2e}.dot.g{background:#28c840}
-    .t-body{padding:22px; font-family:'Space Mono',monospace; font-size:.8rem; line-height:1.95}
-    .t-prompt{color:var(--orange)} .t-out{color:var(--muted)} .t-str{color:#a3d96a}
-    .t-cursor{display:inline-block; width:7px; height:13px; background:var(--orange); animation:blink 1s step-end infinite}
+    /* ── HERO ── */
+    #hero{
+      min-height:100vh;display:flex;align-items:center;
+      padding:140px 64px 80px;overflow:hidden;
+    }
+    .hero-inner{max-width:1240px;margin:auto;width:100%;display:grid;grid-template-columns:1.1fr 0.9fr;gap:72px;align-items:center}
+    .hero-kicker{
+      font-family:'Space Mono',monospace;font-size:.68rem;
+      color:var(--orange);letter-spacing:.2em;text-transform:uppercase;
+      display:flex;align-items:center;gap:10px;margin-bottom:18px;
+      opacity:0;animation:slideUp .6s .2s var(--transition) forwards;
+    }
+    .hero-kicker::before{content:'//';color:var(--muted);margin-right:2px}
+    h1.hero-name{
+      font-family:'Syne',sans-serif;
+      font-size:clamp(4.5rem,9vw,9.5rem);line-height:.92;
+      letter-spacing:-.01em;color:var(--white);
+      opacity:0;animation:slideUp .8s .35s var(--transition) forwards;
+    }
+    h1.hero-name .line-orange{
+      display:block;color:var(--orange);
+      text-shadow:0 0 60px rgba(255,69,0,0.3);
+    }
+    h1.hero-name .line-outline{
+      display:block;
+      -webkit-text-stroke:1.5px rgba(255,69,0,0.35);
+      color:transparent;
+    }
+    .hero-desc{
+      margin-top:22px;font-size:.95rem;color:var(--muted);
+      line-height:1.85;max-width:420px;
+      opacity:0;animation:slideUp .7s .5s var(--transition) forwards;
+    }
+    .hero-desc strong{color:var(--text)}
+    .hero-typerow{
+      margin-top:10px;font-size:.95rem;color:var(--muted);
+      opacity:0;animation:slideUp .7s .52s var(--transition) forwards;
+    }
+    .hero-typerow strong{color:var(--orange)}
+    .hero-actions{
+      display:flex;gap:14px;margin-top:38px;flex-wrap:wrap;
+      opacity:0;animation:slideUp .7s .64s var(--transition) forwards;
+    }
+    .btn-primary{
+      display:inline-flex;align-items:center;gap:9px;
+      padding:13px 30px;background:var(--orange);color:#000;
+      font-family:'Space Mono',monospace;font-size:.76rem;
+      font-weight:700;border-radius:2px;letter-spacing:.05em;
+      transition:background .25s,box-shadow .3s,transform .25s var(--spring);
+    }
+    .btn-primary:hover{background:var(--orange2);box-shadow:var(--glow);transform:translateY(-3px)}
+    .btn-secondary{
+      display:inline-flex;align-items:center;gap:9px;
+      padding:13px 30px;border:1px solid rgba(255,69,0,0.28);
+      color:var(--text);font-family:'Space Mono',monospace;font-size:.76rem;
+      border-radius:2px;letter-spacing:.05em;
+      transition:border-color .25s,color .25s,box-shadow .3s,transform .25s var(--spring);
+    }
+    .btn-secondary:hover{border-color:var(--orange);color:var(--orange);box-shadow:var(--glow-sm);transform:translateY(-3px)}
 
-    /* STATS & GH ROW */
-    #stats{padding:56px 64px; border-top:1px solid rgba(255,69,0,0.08); background:var(--bg2);}
-    .stats-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:2px}
-    .stat-card{background:var(--bg3); padding:30px 22px; text-align:center; transition: .3s;}
-    .stat-num{font-family:'Syne',sans-serif; font-size:3.2rem; color:var(--white);}
-    .gh-wrap{max-width:1240px; margin:0 auto; padding:40px 64px; display:grid; grid-template-columns:1fr 1fr; gap:18px;}
-    .gh-rendered, .gh-card{background:var(--bg3); border:1px solid var(--border); border-radius:4px; padding:24px;}
-    .gh-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:15px;}
-    .gh-cell{background:var(--bg); padding:14px; border:1px solid rgba(255,69,0,0.08);}
-    .gh-avatar{width:36px; height:36px; border-radius:50%; border:2px solid var(--orange);}
+    /* Terminal */
+    .hero-visual{opacity:0;animation:slideLeft .8s .45s var(--transition) forwards}
+    .terminal{
+      background:var(--bg2);border:1px solid rgba(255,69,0,0.18);
+      border-radius:8px;overflow:hidden;
+      box-shadow:0 40px 100px rgba(0,0,0,.65),var(--glow);
+    }
+    .terminal-bar{
+      display:flex;align-items:center;gap:8px;padding:13px 16px;
+      background:rgba(0,0,0,.55);border-bottom:1px solid rgba(255,69,0,0.1);
+    }
+    .dot{width:11px;height:11px;border-radius:50%}
+    .dot.r{background:#ff5f57}.dot.y{background:#ffbd2e}.dot.g{background:#28c840}
+    .t-title{flex:1;text-align:center;font-family:'Space Mono',monospace;font-size:.68rem;color:var(--muted)}
+    .t-body{padding:22px;font-family:'Space Mono',monospace;font-size:.8rem;line-height:1.95}
+    .t-line{opacity:0;transition:opacity .18s}
+    .t-prompt{color:var(--orange)}.t-cmd{color:var(--white)}.t-out{color:var(--muted)}.t-val{color:var(--orange2)}.t-str{color:#a3d96a}
+    .t-cursor{display:inline-block;width:7px;height:13px;background:var(--orange);vertical-align:middle;animation:blink 1s step-end infinite}
 
-    /* ABOUT & PROJECTS */
-    #about, #projects, #languages{padding:120px 64px; max-width:1240px; margin:auto;}
-    .about-grid, .lang-inner{display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:start}
-    .skill-pill{padding:7px 15px; border:1px solid rgba(255,69,0,0.18); font-family:'Space Mono',monospace; font-size:.68rem; color:var(--orange); margin:4px; display:inline-block;}
-    .proj-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:50px;}
-    .repo-card{background:var(--bg3); border:1px solid rgba(255,69,0,0.08); padding:22px; border-radius:4px; transition: .3s var(--spring); cursor: pointer;}
-    .repo-card:hover{transform:translateY(-6px); border-color:var(--orange); box-shadow:var(--glow);}
-    .repo-name{font-family:'Syne',sans-serif; font-weight:800; color:var(--white); margin-bottom:10px;}
+    /* ── STATS BAND ── */
+    #stats{
+      padding:56px 64px;
+      border-top:1px solid rgba(255,69,0,0.08);
+      border-bottom:1px solid rgba(255,69,0,0.08);
+      background:var(--bg2);
+    }
+    .stats-inner{max-width:1240px;margin:auto}
+    .stats-label{
+      text-align:center;font-family:'Space Mono',monospace;font-size:.66rem;
+      color:var(--muted);letter-spacing:.16em;text-transform:uppercase;margin-bottom:36px;
+    }
+    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px}
+    .stat-card{
+      background:var(--bg3);padding:30px 22px;text-align:center;
+      position:relative;overflow:hidden;
+      transition:background .3s,transform .3s var(--spring);
+    }
+    .stat-card:first-child{border-radius:4px 0 0 4px}
+    .stat-card:last-child{border-radius:0 4px 4px 0}
+    .stat-card::before{
+      content:'';position:absolute;top:0;left:0;right:0;height:2px;
+      background:linear-gradient(90deg,var(--red),var(--orange));
+      transform:scaleX(0);transform-origin:left;
+      transition:transform .4s var(--transition);
+    }
+    .stat-card:hover{background:rgba(255,69,0,0.04);transform:translateY(-3px)}
+    .stat-card:hover::before{transform:scaleX(1)}
+    .stat-num{
+      font-family:'Syne',sans-serif;font-size:3.2rem;
+      color:var(--white);letter-spacing:.02em;
+      transition:color .3s;
+    }
+    .stat-card:hover .stat-num{color:var(--orange)}
+    .stat-sub{font-size:.72rem;color:var(--muted);margin-top:4px;letter-spacing:.06em;font-family:'Space Mono',monospace}
+    .stat-icon{font-size:1.2rem;margin-bottom:8px;display:block}
 
-    /* LANGUAGES */
-    .lbar-row{margin-bottom:20px;}
-    .lbar-track{height:5px; background:var(--bg3); width:100%;}
-    .lbar-fill{height:100%; background:var(--orange); width:0%; transition: 1.5s var(--transition);}
+    /* GH stats row */
+    .gh-wrap{
+      max-width:1240px;margin:0 auto;padding:0 64px 56px;
+      display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:stretch;
+    }
+    .gh-card{
+      border:1px solid var(--border);border-radius:4px;
+      background:var(--bg3);transition:box-shadow .3s,transform .3s var(--spring);
+      overflow:hidden;
+    }
+    .gh-card:hover{box-shadow:var(--glow);transform:translateY(-3px)}
+    .gh-card img{width:100%;height:100%;display:block;object-fit:contain;padding:18px}
+    .gh-rendered{
+      border:1px solid var(--border);border-radius:4px;
+      background:var(--bg3);padding:24px;
+      display:flex;flex-direction:column;gap:14px;
+      transition:box-shadow .3s,transform .3s var(--spring);
+    }
+    .gh-rendered:hover{box-shadow:var(--glow);transform:translateY(-3px)}
+    .gh-rlabel{font-family:'Space Mono',monospace;font-size:.64rem;color:var(--muted);letter-spacing:.14em;text-transform:uppercase}
+    .gh-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .gh-cell{
+      background:var(--bg);border:1px solid rgba(255,69,0,0.08);border-radius:3px;
+      padding:14px 16px;transition:border-color .25s;
+    }
+    .gh-cell:hover{border-color:rgba(255,69,0,0.3)}
+    .gh-cell-icon{font-size:1rem;margin-bottom:5px}
+    .gh-cell-num{font-family:'Syne',sans-serif;font-size:2.1rem;color:var(--white);line-height:1}
+    .gh-cell-label{font-size:.64rem;color:var(--muted);margin-top:3px;font-family:'Space Mono',monospace}
+    .gh-profile{
+      background:var(--bg);border:1px solid rgba(255,69,0,0.08);border-radius:3px;
+      padding:12px 14px;display:flex;align-items:center;gap:12px;
+      transition:border-color .25s;
+    }
+    .gh-profile:hover{border-color:rgba(255,69,0,0.3)}
+    .gh-avatar{width:36px;height:36px;border-radius:50%;border:2px solid var(--orange);flex-shrink:0;object-fit:cover}
+    .gh-uname{color:var(--white);font-weight:600;font-size:.86rem}
+    .gh-since{color:var(--muted);font-size:.64rem;font-family:'Space Mono',monospace;margin-top:1px}
+    .gh-view{margin-left:auto;color:var(--orange);font-size:.66rem;font-family:'Space Mono',monospace;flex-shrink:0;transition:opacity .2s}
+    .gh-view:hover{opacity:.7}
 
-    /* CTA SECTION - MOBILE FIXED */
-    #cta{padding:140px 64px; position:relative; overflow:hidden; text-align:center;}
+    /* ── ABOUT ── */
+    #about{padding:120px 64px}
+    .sec-header{max-width:1240px;margin:0 auto 56px}
+    .sec-kicker{
+      font-family:'Space Mono',monospace;font-size:.66rem;
+      color:var(--orange);letter-spacing:.18em;text-transform:uppercase;
+      display:flex;align-items:center;gap:10px;margin-bottom:12px;
+    }
+    .sec-kicker::before{content:'//';color:var(--muted)}
+    h2.sec-title{
+      font-family:'Syne',sans-serif;font-weight:800;
+      font-size:clamp(3rem,6vw,6.5rem);color:var(--white);
+      letter-spacing:-.01em;line-height:.92;
+    }
+    .about-grid{max-width:1240px;margin:auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+    .about-text p{color:var(--muted);line-height:1.9;margin-bottom:16px;font-size:.92rem}
+    .about-text p strong{color:var(--text)}
+    .skills-wrap{display:flex;flex-wrap:wrap;gap:8px;margin-top:28px}
+    .skill-pill{
+      padding:7px 15px;border:1px solid rgba(255,69,0,0.18);border-radius:2px;
+      font-family:'Space Mono',monospace;font-size:.68rem;color:var(--orange);
+      background:rgba(255,69,0,0.04);
+      transition:background .25s,border-color .25s,box-shadow .3s,transform .2s var(--spring);
+    }
+    .skill-pill:hover{background:rgba(255,69,0,0.1);border-color:var(--orange);box-shadow:var(--glow-sm);transform:translateY(-2px)}
+    .info-col{display:flex;flex-direction:column;gap:11px}
+    .info-row{
+      display:flex;align-items:center;gap:14px;padding:15px 19px;
+      background:var(--bg2);border:1px solid rgba(255,69,0,0.08);border-radius:3px;
+      transition:border-color .3s,box-shadow .3s,transform .3s var(--spring);
+    }
+    .info-row:hover{border-color:rgba(255,69,0,0.4);box-shadow:var(--glow-sm);transform:translateX(4px)}
+    .info-icon{font-size:1.15rem;width:34px;text-align:center;flex-shrink:0}
+    .info-label{font-size:.64rem;color:var(--muted);font-family:'Space Mono',monospace;letter-spacing:.09em;text-transform:uppercase}
+    .info-val{font-size:.87rem;color:var(--text);font-weight:500;margin-top:2px}
+
+    /* ── PROJECTS ── */
+    #projects{padding:120px 64px;background:var(--bg2)}
+    .proj-inner{max-width:1240px;margin:auto}
+    .proj-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    .repo-card{
+      background:var(--bg3);border:1px solid rgba(255,69,0,0.08);border-radius:4px;
+      padding:22px;display:flex;flex-direction:column;gap:11px;
+      transition:border-color .3s,transform .35s var(--spring),box-shadow .35s;
+      position:relative;overflow:hidden;cursor:pointer;
+    }
+    .repo-card::before{
+      content:'';position:absolute;top:0;left:0;right:0;height:2px;
+      background:linear-gradient(90deg,var(--red),var(--orange));
+      transform:scaleX(0);transform-origin:left;
+      transition:transform .35s var(--transition);
+    }
+    .repo-card:hover{border-color:rgba(255,69,0,0.45);transform:translateY(-6px);box-shadow:0 20px 60px rgba(0,0,0,.4),var(--glow)}
+    .repo-card:hover::before{transform:scaleX(1)}
+    .repo-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+    .repo-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem;color:var(--white);letter-spacing:.02em;line-height:1.2}
+    .repo-arrow{color:var(--muted);font-size:.9rem;transition:color .2s,transform .2s var(--spring);flex-shrink:0}
+    .repo-card:hover .repo-arrow{color:var(--orange);transform:translate(2px,-2px)}
+    .repo-desc{font-size:.79rem;color:var(--muted);line-height:1.72;flex:1}
+    .repo-meta{display:flex;align-items:center;gap:13px;flex-wrap:wrap}
+    .repo-lang{display:flex;align-items:center;gap:5px;font-family:'Space Mono',monospace;font-size:.66rem;color:var(--muted)}
+    .ldot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    .repo-stars,.repo-forks{font-family:'Space Mono',monospace;font-size:.66rem;color:var(--muted)}
+    .repo-updated{font-family:'Space Mono',monospace;font-size:.64rem;color:var(--muted);margin-top:auto;padding-top:4px;border-top:1px solid rgba(255,69,0,0.06)}
+    .skeleton{
+      background:linear-gradient(90deg,var(--bg3) 25%,rgba(255,255,255,.025) 50%,var(--bg3) 75%);
+      background-size:200% 100%;animation:shimmer 1.6s infinite;border-radius:4px;
+    }
+    .sk-card{height:180px;border:1px solid rgba(255,69,0,0.05);border-radius:4px}
+
+    /* ── LANGUAGES ── */
+    #languages{padding:120px 64px}
+    .lang-inner{max-width:1240px;margin:auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+    .lang-bars{display:flex;flex-direction:column;gap:18px}
+    .lbar-row{display:flex;flex-direction:column;gap:7px}
+    .lbar-label{display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:.74rem;color:var(--text)}
+    .lbar-track{height:5px;background:var(--bg3);border-radius:0;overflow:hidden}
+    .lbar-fill{height:100%;transform:scaleX(0);transform-origin:left;transition:transform 1.4s var(--transition);border-radius:0}
+
+    /* ── ACTIVITY ── */
+    #activity{padding:0 64px 120px}
+    .act-inner{max-width:1240px;margin:auto}
+    .contrib-box{
+      background:var(--bg2);border:1px solid rgba(255,69,0,0.1);border-radius:4px;overflow:hidden;
+    }
+    .contrib-box img{width:100%;display:block}
+
+    /* ── CTA ── */
+    #cta{padding:140px 64px;position:relative;overflow:hidden}
     .cta-glow{
-      position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-      width:700px; height:400px; pointer-events:none;
-      background:radial-gradient(ellipse,rgba(255,69,0,0.1) 0%,transparent 70%);
-      z-index: 0;
+      position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+      width:700px;height:400px;pointer-events:none;
+      background:radial-gradient(ellipse,rgba(255,69,0,0.06) 0%,transparent 70%);
     }
-    .cta-inner{max-width:680px; margin:auto; position:relative; z-index:1;}
+    .cta-inner{max-width:680px;margin:auto;text-align:center;position:relative;z-index:1}
     h2.cta-title{
-      font-family:'Syne',sans-serif; font-size:clamp(2.5rem, 8vw, 6rem); 
-      line-height:.95; color:var(--white); margin-bottom:20px;
+      font-family:'Syne',sans-serif;font-weight:800;
+      font-size:clamp(3.2rem,7vw,6.5rem);color:var(--white);
+      letter-spacing:-.01em;line-height:.92;margin-bottom:20px;
     }
-    .orange{color:var(--orange)}
-    .contact-form{display:flex; flex-direction:column; gap:13px; margin-top:40px;}
-    .form-row{display:grid; grid-template-columns:1fr 1fr; gap:13px;}
-    input, textarea{
-      background:var(--bg2); border:1px solid rgba(255,69,0,0.15); 
-      padding:15px; color:var(--white); outline:none; width: 100%;
+    h2.cta-title .orange{color:var(--orange);text-shadow:0 0 50px rgba(255,69,0,0.35)}
+    .cta-sub{color:var(--muted);font-size:.92rem;line-height:1.85;margin-bottom:44px}
+    .contact-form{max-width:540px;margin:0 auto;display:flex;flex-direction:column;gap:13px}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+    .form-field{display:flex;flex-direction:column;gap:6px}
+    .form-field label{font-family:'Space Mono',monospace;font-size:.63rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+    .form-field input,.form-field textarea{
+      background:var(--bg2);border:1px solid rgba(255,69,0,0.12);
+      border-radius:2px;padding:11px 14px;color:var(--white);
+      font-family:'Inter',sans-serif;font-size:.88rem;
+      transition:border-color .3s,box-shadow .3s;outline:none;resize:none;
     }
-    input:focus, textarea:focus{border-color:var(--orange)}
-    .form-btn{background:var(--orange); border:none; padding:15px 40px; font-family:'Space Mono',monospace; font-weight:700; cursor:pointer; width: fit-content; margin: 20px auto;}
+    .form-field input::placeholder,.form-field textarea::placeholder{color:var(--muted);opacity:.7}
+    .form-field input:focus,.form-field textarea:focus{border-color:var(--orange);box-shadow:0 0 20px rgba(255,69,0,0.12)}
+    .form-field textarea{min-height:108px}
+    .form-btn{
+      background:var(--orange);color:#000;border:none;cursor:pointer;
+      padding:13px 30px;font-family:'Space Mono',monospace;font-size:.76rem;
+      font-weight:700;letter-spacing:.06em;border-radius:2px;
+      transition:background .25s,box-shadow .3s,transform .25s var(--spring);
+      display:inline-flex;align-items:center;gap:8px;width:fit-content;margin:0 auto;
+    }
+    .form-btn:hover{background:var(--orange2);box-shadow:var(--glow);transform:translateY(-3px)}
 
-    /* FOOTER */
-    footer{padding:40px 64px; border-top:1px solid rgba(255,69,0,0.08); display:flex; justify-content:space-between; font-size:.7rem; color:var(--muted);}
+    .cta-socials{display:flex;justify-content:center;gap:11px;margin-top:44px;flex-wrap:wrap}
+    .soc-link{
+      display:flex;align-items:center;gap:7px;
+      padding:9px 17px;border:1px solid rgba(255,69,0,0.15);border-radius:2px;
+      font-family:'Space Mono',monospace;font-size:.68rem;color:var(--muted);
+      transition:border-color .3s,color .3s,box-shadow .3s,transform .25s var(--spring);
+    }
+    .soc-link:hover{border-color:var(--orange);color:var(--orange);box-shadow:var(--glow-sm);transform:translateY(-2px)}
+    .soc-link svg{width:14px;height:14px}
 
-    /* ANIMATIONS */
-    .reveal{opacity:0; transform:translateY(30px); transition: 1s var(--transition);}
-    .reveal.visible{opacity:1; transform:translateY(0);}
+    /* ── FOOTER ── */
+    footer{
+      border-top:1px solid rgba(255,69,0,0.08);padding:26px 64px;
+      display:flex;align-items:center;justify-content:space-between;
+      background:var(--bg2);
+    }
+    .foot-logo{font-family:'Syne',sans-serif;font-size:1.1rem;color:var(--muted);letter-spacing:.06em}
+    .foot-logo span{color:var(--orange)}
+    .foot-copy{font-family:'Space Mono',monospace;font-size:.66rem;color:var(--muted)}
+    .foot-top{font-family:'Space Mono',monospace;font-size:.66rem;color:var(--muted);transition:color .25s}
+    .foot-top:hover{color:var(--orange)}
+
+    /* ── DIVIDER ── */
+    .hdiv{max-width:1240px;margin:0 auto;height:1px;background:linear-gradient(90deg,transparent,rgba(255,69,0,0.12),transparent)}
+
+    /* ── ANIMATIONS ── */
+    @keyframes slideUp{from{opacity:0;transform:translateY(32px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes slideLeft{from{opacity:0;transform:translateX(36px)}to{opacity:1;transform:translateX(0)}}
     @keyframes blink{50%{opacity:0}}
-    .skeleton{background:#1a1a1a; height:180px; border-radius:4px;}
+    @keyframes shimmer{to{background-position:-200% 0}}
+    @keyframes floatUp{
+      0%,100%{transform:translateY(0)}
+      50%{transform:translateY(-8px)}
+    }
+    .reveal{opacity:0;transform:translateY(28px);transition:opacity .8s var(--transition),transform .8s var(--transition)}
+    .reveal.visible{opacity:1;transform:translateY(0)}
+    .reveal-left{opacity:0;transform:translateX(-24px);transition:opacity .8s var(--transition),transform .8s var(--transition)}
+    .reveal-left.visible{opacity:1;transform:translateX(0)}
 
-    /* RESPONSIVE OVERRIDES */
-@media (max-width: 600px) {
-  /* Prevent the glow from pushing the page width */
-  .cta-glow {
-    width: 100%;
-    height: 300px;
-    filter: blur(80px); /* Soften it since it's smaller */
-  }
+    /* LANG COLORS */
+    .lc-js{background:#f1e05a}.lc-ts{background:#2b7489}.lc-py{background:#3572A5}
+    .lc-html{background:#e34c26}.lc-css{background:#563d7c}.lc-java{background:#b07219}
+    .lc-cpp{background:#f34b7d}.lc-c{background:#555}.lc-go{background:#00ADD8}
+    .lc-rs{background:#dea584}.lc-rb{background:#701516}.lc-php{background:#4F5D95}
+    .lc-sh{background:#89e051}.lc-swift{background:#ffac45}.lc-kt{background:#F18E33}
+    .lc-def{background:var(--muted)}
 
-  /* Force the title to wrap and stay within bounds */
-  h2.cta-title {
-    font-size: clamp(2.5rem, 12vw, 4rem);
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    width: 100%;
-  }
-
-  /* Ensure the form doesn't exceed the viewport padding */
-  .contact-form {
-    width: 100%;
-  }
-
-  /* Ensure sections don't leak horizontally */
-  #cta {
-    padding: 80px 20px;
-    overflow: hidden; /* This is the safety net */
-  }
-}
+    /* RESPONSIVE */
+    @media(max-width:960px){
+      nav{padding:15px 24px}
+      .nav-links{display:none}
+      #hero{padding:110px 24px 60px}
+      .hero-inner{grid-template-columns:1fr;gap:44px}
+      #stats{padding:40px 24px}
+      .stats-grid{grid-template-columns:repeat(2,1fr)}
+      .gh-wrap{padding:0 24px 40px;grid-template-columns:1fr}
+      #about{padding:80px 24px}.about-grid{grid-template-columns:1fr;gap:44px}
+      #projects{padding:80px 24px}.proj-grid{grid-template-columns:1fr}
+      #languages{padding:80px 24px}.lang-inner{grid-template-columns:1fr}
+      #activity{padding:0 24px 80px}
+      #cta{padding:80px 24px}.form-row{grid-template-columns:1fr}
+      footer{padding:18px 24px;flex-direction:column;gap:10px;text-align:center}
+    }
   </style>
 </head>
-<body class="c-on">
+<body>
 
 <div id="cur-dot"></div>
 <div id="cur-ring"></div>
 <div id="scrollbar"></div>
 
+<!-- NAV -->
 <nav id="main-nav">
   <div class="nav-logo">ASD<span>.</span></div>
   <ul class="nav-links">
     <li><a href="#about">About</a></li>
     <li><a href="#projects">Projects</a></li>
+    <li><a href="#languages">Skills</a></li>
     <li><a href="#cta">Contact</a></li>
   </ul>
   <a href="https://github.com/arafat-suhail-dar" target="_blank" class="nav-cta">GitHub ↗</a>
 </nav>
 
+<!-- HERO -->
 <section id="hero">
   <div class="hero-inner">
     <div>
-      <div class="hero-kicker">// Hello, World! I am</div>
-      <h1 class="hero-name">Arafat<br/><span class="line-orange">Suhail</span><span class="line-outline">Dar</span></h1>
-      <div class="hero-typerow" style="margin-top:15px">I am a <strong><span id="typewriter" style="color:var(--orange); border-right:2px solid var(--orange)"></span></strong></div>
-      <p class="hero-desc">Building clean software and exploring the depths of engineering. Based in Sopore, J&K.</p>
+      <div class="hero-kicker">Hello, World! I am</div>
+      <h1 class="hero-name">
+        Arafat<br/>
+        <span class="line-orange">Suhail</span>
+        <span class="line-outline">Dar</span>
+      </h1>
+      <div class="hero-typerow">I am a <strong><span id="typewriter" style="border-right:2px solid var(--orange);padding-right:2px"></span></strong></div>
+      <p class="hero-desc">I build clean software, explore the depths of engineering, and turn ideas into code &amp; impact — one commit at a time.</p>
       <div class="hero-actions">
-        <a href="#projects" class="btn-primary">View Projects</a>
-        <a href="#cta" class="btn-secondary">Contact Me</a>
+        <a href="#projects" class="btn-primary">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+          View Projects
+        </a>
+        <a href="#cta" class="btn-secondary">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Contact Me
+        </a>
       </div>
     </div>
     <div class="hero-visual">
       <div class="terminal">
-        <div class="terminal-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div style="flex:1; text-align:center; font-size:.6rem; color:var(--muted)">bash</div></div>
-        <div class="t-body">
-          <div class="t-line"><span class="t-prompt">❯ </span>whoami</div>
-          <div style="color:var(--orange2)">arafat-suhail-dar</div>
-          <div class="t-line"><span class="t-prompt">❯ </span>cat status.json</div>
-          <div class="t-out">{</div>
-          <div class="t-out">&nbsp;&nbsp;"status": <span class="t-str">"Building"</span>,</div>
-          <div class="t-out">&nbsp;&nbsp;"location": <span class="t-str">"Kashmir"</span></div>
-          <div class="t-out">}</div>
+        <div class="terminal-bar">
+          <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+          <div class="t-title">arafat@portfolio ~ bash</div>
+        </div>
+        <div class="t-body" id="t-body">
+          <div class="t-line"><span class="t-prompt">❯ </span><span class="t-cmd">whoami</span></div>
+          <div class="t-line"><span class="t-val">arafat-suhail-dar</span></div>
+          <div class="t-line">&nbsp;</div>
+          <div class="t-line"><span class="t-prompt">❯ </span><span class="t-cmd">cat profile.json</span></div>
+          <div class="t-line"><span class="t-out">{</span></div>
+          <div class="t-line">&nbsp;&nbsp;<span class="t-out">"role":</span> <span class="t-str">"Developer"</span><span class="t-out">,</span></div>
+          <div class="t-line">&nbsp;&nbsp;<span class="t-out">"status":</span> <span class="t-str">"open to work"</span><span class="t-out">,</span></div>
+          <div class="t-line">&nbsp;&nbsp;<span class="t-out">"passion":</span> <span class="t-str">"building cool stuff"</span><span class="t-out">,</span></div>
+          <div class="t-line">&nbsp;&nbsp;<span class="t-out">"github":</span> <span class="t-str">"arafat-suhail-dar"</span><span class="t-out">,</span></div>
+          <div class="t-line">&nbsp;&nbsp;<span class="t-out">"location":</span> <span class="t-str">"🌍 Earth"</span></div>
+          <div class="t-line"><span class="t-out">}</span></div>
+          <div class="t-line">&nbsp;</div>
           <div class="t-line"><span class="t-prompt">❯ </span><span class="t-cursor"></span></div>
         </div>
       </div>
@@ -209,155 +532,343 @@
   </div>
 </section>
 
+<!-- STATS -->
 <section id="stats">
-  <div class="stats-grid">
-    <div class="stat-card"><div class="stat-num" id="s-repos">..</div><div style="font-size:.7rem; color:var(--muted)">Public Repos</div></div>
-    <div class="stat-card"><div class="stat-num" id="s-followers">..</div><div style="font-size:.7rem; color:var(--muted)">Followers</div></div>
-    <div class="stat-card"><div class="stat-num">99%</div><div style="font-size:.7rem; color:var(--muted)">Uptime</div></div>
-    <div class="stat-card"><div class="stat-num" id="s-joined">..</div><div style="font-size:.7rem; color:var(--muted)">Joined Year</div></div>
+  <div class="stats-inner">
+    <div class="stats-label">// github_metrics — live · arafat-suhail-dar</div>
+    <div class="stats-grid">
+      <div class="stat-card"><span class="stat-icon">📦</span><div class="stat-num" id="s-repos">—</div><div class="stat-sub">Public Repos</div></div>
+      <div class="stat-card"><span class="stat-icon">⭐</span><div class="stat-num" id="s-stars">—</div><div class="stat-sub">Total Stars</div></div>
+      <div class="stat-card"><span class="stat-icon">👥</span><div class="stat-num" id="s-followers">—</div><div class="stat-sub">Followers</div></div>
+      <div class="stat-card"><span class="stat-icon">🔀</span><div class="stat-num" id="s-forks">—</div><div class="stat-sub">Total Forks</div></div>
+    </div>
   </div>
 </section>
 
+<!-- GH STATS ROW -->
 <div class="gh-wrap reveal">
   <div class="gh-rendered">
-    <div style="font-size:.6rem; text-transform:uppercase; color:var(--muted)">GitHub Profile Summary</div>
-    <div class="gh-grid" id="gh-details">
-        <!-- JS fills this -->
+    <div class="gh-rlabel">GitHub Stats · arafat-suhail-dar</div>
+    <div class="gh-grid">
+      <div class="gh-cell"><div class="gh-cell-icon">📦</div><div class="gh-cell-num" id="gr-repos">—</div><div class="gh-cell-label">Public Repos</div></div>
+      <div class="gh-cell"><div class="gh-cell-icon">⭐</div><div class="gh-cell-num" id="gr-stars">—</div><div class="gh-cell-label">Stars Earned</div></div>
+      <div class="gh-cell"><div class="gh-cell-icon">👥</div><div class="gh-cell-num" id="gr-followers">—</div><div class="gh-cell-label">Followers</div></div>
+      <div class="gh-cell"><div class="gh-cell-icon">👣</div><div class="gh-cell-num" id="gr-following">—</div><div class="gh-cell-label">Following</div></div>
+    </div>
+    <div class="gh-profile">
+      <img class="gh-avatar" id="gr-avatar" src="" alt="avatar" onerror="this.style.display='none'"/>
+      <div><div class="gh-uname" id="gr-name">arafat-suhail-dar</div><div class="gh-since" id="gr-since">Loading...</div></div>
+      <a class="gh-view" href="https://github.com/arafat-suhail-dar" target="_blank">View ↗</a>
     </div>
   </div>
-  <div class="gh-card" style="display:flex; align-items:center; justify-content:center;">
-    <img id="gh-streak" src="https://github-readme-streak-stats.herokuapp.com?user=arafat-suhail-dar&theme=dark&background=161616&ring=ff4500&fire=ff4500" alt="Streak" style="max-width:100%">
+  <div class="gh-card">
+    <img src="https://streak-stats.demolab.com?user=arafat-suhail-dar&theme=dark&background=0f0f0f&ring=ff4500&fire=ff6b00&currStreakLabel=ff4500&sideLabels=bdb8b2&border=1c1c1c&dates=4e4a46&stroke=1c1c1c" alt="GitHub Streak" loading="lazy"
+      onerror="this.onerror=null;this.src='https://github-readme-streak-stats-nine-omega.vercel.app?user=arafat-suhail-dar&theme=dark&background=0f0f0f&ring=ff4500&fire=ff6b00'"/>
   </div>
 </div>
 
+<!-- ABOUT -->
 <section id="about">
+  <div class="sec-header reveal">
+    <div class="sec-kicker">#02 // About_Me</div>
+    <h2 class="sec-title">About<br/>Me</h2>
+  </div>
   <div class="about-grid">
-    <div class="reveal">
-        <h2 style="font-family:Syne; font-size:3rem; color:var(--white); margin-bottom:20px;">About Me</h2>
-        <p style="line-height:1.8; margin-bottom:20px;">I'm a developer passionate about open source and clean architecture. I specialize in building web applications that are both functional and visually striking.</p>
-        <div id="skills">
-            <span class="skill-pill">JavaScript</span><span class="skill-pill">Python</span><span class="skill-pill">Node.js</span><span class="skill-pill">React</span><span class="skill-pill">Git</span>
-        </div>
+    <div class="about-text reveal">
+      <p>Hello! I'm <strong>Arafat Suhail Dar</strong> — a developer who loves turning ideas into real-world software. I care about writing clean, maintainable code and building things that actually matter.</p>
+      <p>I thrive at the intersection of <strong>creativity and engineering</strong> — whether it's crafting elegant UIs, building robust back-end systems, or exploring new technologies that push the envelope.</p>
+      <p>When I'm not writing code, I'm probably exploring open-source projects, learning something new, or thinking of the next thing to build.</p>
+      <div class="skills-wrap" id="skills-wrap">
+        <span class="skill-pill">JavaScript</span>
+        <span class="skill-pill">Python</span>
+        <span class="skill-pill">HTML/CSS</span>
+        <span class="skill-pill">Git</span>
+        <span class="skill-pill">Open Source</span>
+        <span class="skill-pill">APIs</span>
+      </div>
     </div>
-    <div class="reveal" style="background:var(--bg2); padding:30px; border:1px solid var(--border)">
-        <div style="margin-bottom:15px;"><small style="color:var(--orange)">EDUCATION</small><br>Apex Public School, Sopore</div>
-        <div style="margin-bottom:15px;"><small style="color:var(--orange)">LOCATION</small><br>Sopore, Jammu & Kashmir</div>
-        <div><small style="color:var(--orange)">INTERESTS</small><br>AI, UI Design, Open Source</div>
+    <div class="info-col reveal">
+      <div class="info-row"><div class="info-icon">🐙</div><div><div class="info-label">GitHub</div><div class="info-val"><a href="https://github.com/arafat-suhail-dar" target="_blank" style="color:var(--orange)">@arafat-suhail-dar ↗</a></div></div></div>
+      <div class="info-row"><div class="info-icon">🏫</div><div><div class="info-label">Education</div><div class="info-val">Apex Public School, Sopore</div></div></div>
+      <div class="info-row"><div class="info-icon">📅</div><div><div class="info-label">Member Since</div><div class="info-val" id="info-joined">—</div></div></div>
+      <div class="info-row"><div class="info-icon">📍</div><div><div class="info-label">Location</div><div class="info-val" id="info-loc">—</div></div></div>
+      <div class="info-row"><div class="info-icon">🔗</div><div><div class="info-label">Website / Blog</div><div class="info-val" id="info-blog">—</div></div></div>
+      <div class="info-row" id="info-bio-row"><div class="info-icon">💡</div><div><div class="info-label">Bio</div><div class="info-val" id="info-bio">Building in the open.</div></div></div>
     </div>
   </div>
 </section>
 
+<div class="hdiv"></div>
+
+<!-- PROJECTS -->
 <section id="projects">
-    <h2 class="reveal" style="font-family:Syne; font-size:3rem; color:var(--white);">Projects</h2>
-    <div class="proj-grid" id="repo-grid">
-        <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+  <div class="proj-inner">
+    <div class="sec-header reveal">
+      <div class="sec-kicker">#04 // Select_Work</div>
+      <h2 class="sec-title">Projects</h2>
     </div>
+    <div class="proj-grid" id="proj-grid">
+      <div class="skeleton sk-card"></div><div class="skeleton sk-card"></div><div class="skeleton sk-card"></div>
+      <div class="skeleton sk-card"></div><div class="skeleton sk-card"></div><div class="skeleton sk-card"></div>
+    </div>
+    <div style="text-align:center;margin-top:34px" class="reveal">
+      <a href="https://github.com/arafat-suhail-dar?tab=repositories" target="_blank" class="btn-secondary">View All Repositories ↗</a>
+    </div>
+  </div>
 </section>
 
+<!-- LANGUAGES -->
 <section id="languages">
-    <div class="lang-inner">
-        <h2 class="reveal" style="font-family:Syne; font-size:3rem; color:var(--white);">Proficiency</h2>
-        <div class="reveal">
-            <div class="lbar-row"><div>JavaScript</div><div class="lbar-track"><div class="lbar-fill" style="width:90%"></div></div></div>
-            <div class="lbar-row"><div>Python</div><div class="lbar-track"><div class="lbar-fill" style="width:75%"></div></div></div>
-            <div class="lbar-row"><div>HTML/CSS</div><div class="lbar-track"><div class="lbar-fill" style="width:95%"></div></div></div>
+  <div class="lang-inner">
+    <div class="reveal">
+      <div class="sec-kicker">#05 // My_Arsenal</div>
+      <h2 class="sec-title">Skills &amp;<br/>Domains</h2>
+      <p style="color:var(--muted);margin-top:16px;font-size:.88rem;line-height:1.85">Languages across all public repos, weighted by usage — a live map of what I actually write.</p>
+      <div style="margin-top:26px">
+        <div id="langs-chart" style="background:var(--bg3);border:1px solid rgba(255,69,0,0.1);border-radius:4px;padding:20px 22px;min-height:76px">
+          <span style="font-family:'Space Mono',monospace;font-size:.72rem;color:var(--muted)">Loading languages...</span>
         </div>
+      </div>
     </div>
+    <div class="lang-bars reveal" id="lang-bars"></div>
+  </div>
 </section>
 
+<!-- ACTIVITY -->
+<section id="activity">
+  <div class="act-inner reveal">
+    <div class="sec-kicker" style="margin-bottom:22px">#06 // GitHub_Activity</div>
+    <div class="contrib-box">
+      <img src="https://github-readme-activity-graph.vercel.app/graph?username=arafat-suhail-dar&bg_color=080808&color=ff4500&line=ff4500&point=ff6b00&area=true&area_color=ff4500&hide_border=true&custom_title=Contribution%20Activity&theme=react-dark"
+        alt="Contribution Graph" loading="lazy" style="width:100%;display:block;border-radius:4px"
+        onerror="this.onerror=null;this.style.padding='24px';this.style.background='var(--bg2)';this.src='https://ghchart.rshah.org/ff4500/arafat-suhail-dar'"/>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
 <section id="cta">
   <div class="cta-glow"></div>
   <div class="cta-inner reveal">
-    <h2 class="cta-title">Let's build <span class="orange">something</span> great.</h2>
-    <p style="color:var(--muted)">Open for collaborations and new opportunities.</p>
-    
-    <form class="contact-form">
+    <div class="sec-kicker" style="justify-content:center">#07 // Get_In_Touch</div>
+    <h2 class="cta-title">Let's build<br/>something <span class="orange">cool</span></h2>
+    <p class="cta-sub">Whether you have a question, a project proposal or just want to say hi — I'm always at the other side. Let's create something awesome together 🚀</p>
+    <div class="contact-form">
       <div class="form-row">
-        <input type="text" placeholder="Name" required>
-        <input type="email" placeholder="Email" required>
+        <div class="form-field"><label>Your Name</label><input type="text" placeholder="Arafat Dar" id="cf-name"/></div>
+        <div class="form-field"><label>Email Address</label><input type="email" placeholder="you@example.com" id="cf-email"/></div>
       </div>
-      <textarea placeholder="Your Message" rows="5" required></textarea>
-      <button type="submit" class="form-btn">Send Message ↗</button>
-    </form>
+      <div class="form-field"><label>Subject</label><input type="text" placeholder="Let's collaborate!" id="cf-subject"/></div>
+      <div class="form-field"><label>Your Message</label><textarea placeholder="Tell me about your project..." id="cf-msg"></textarea></div>
+      <button class="form-btn" onclick="handleForm()">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Send Message ↗
+      </button>
+    </div>
+    <div class="cta-socials">
+      <a class="soc-link" href="https://github.com/arafat-suhail-dar" target="_blank">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+        GitHub
+      </a>
+      <a class="soc-link" href="https://twitter.com/arafatsuhaildar" target="_blank">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/></svg>
+        Twitter
+      </a>
+      <a class="soc-link" href="https://linkedin.com/in/arafat-suhail-dar" target="_blank">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+        LinkedIn
+      </a>
+      <a class="soc-link" href="mailto:arafatsuhaildar@gmail.com">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Email
+      </a>
+    </div>
   </div>
 </section>
 
+<!-- FOOTER -->
 <footer>
-  <div>ASD<span>.</span></div>
-  <div style="font-family:'Space Mono'">© 2026 — Arafat Suhail Dar</div>
-  <a href="#hero">↑ TOP</a>
+  <div class="foot-logo">ASD<span>.</span></div>
+  <div class="foot-copy">© 2025 Arafat Suhail Dar — Built with 🔥 &amp; caffeine</div>
+  <a href="#hero" class="foot-top">↑ Back to top</a>
 </footer>
 
 <script>
-  // CURSOR
-  const dot = document.getElementById('cur-dot');
-  const ring = document.getElementById('cur-ring');
-  document.addEventListener('mousemove', (e) => {
-    dot.style.top = ring.style.top = e.clientY + 'px';
-    dot.style.left = ring.style.left = e.clientX + 'px';
-  });
-  document.querySelectorAll('a, button, .repo-card').forEach(el => {
-    el.addEventListener('mouseenter', () => document.body.classList.add('c-hover'));
-    el.addEventListener('mouseleave', () => document.body.classList.remove('c-hover'));
-  });
+/* ── CURSOR ── */
+const dot=document.getElementById('cur-dot'),ring=document.getElementById('cur-ring');
+let mx=innerWidth/2,my=innerHeight/2,rx=mx,ry=my,on=false;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX;my=e.clientY;
+  dot.style.left=mx+'px';dot.style.top=my+'px';
+  if(!on){on=true;document.body.classList.add('c-on')}
+});
+document.addEventListener('mouseleave',()=>document.body.classList.remove('c-on'));
+(function loop(){rx+=(mx-rx)*.1;ry+=(my-ry)*.1;ring.style.left=Math.round(rx)+'px';ring.style.top=Math.round(ry)+'px';requestAnimationFrame(loop)})();
+document.querySelectorAll('a,button,.repo-card,.stat-card,.skill-pill,.soc-link,.gh-cell,.info-row').forEach(el=>{
+  el.addEventListener('mouseenter',()=>document.body.classList.add('c-hover'));
+  el.addEventListener('mouseleave',()=>document.body.classList.remove('c-hover'));
+});
+document.addEventListener('mousedown',()=>document.body.classList.add('c-click'));
+document.addEventListener('mouseup',()=>document.body.classList.remove('c-click'));
 
-  // SCROLL PROGRESS
-  window.addEventListener('scroll', () => {
-    const scroll = document.documentElement.scrollTop;
-    const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-    document.getElementById('scrollbar').style.width = (scroll / height) * 100 + '%';
-    document.getElementById('main-nav').classList.toggle('scrolled', scroll > 50);
-    
-    // Animate language bars when visible
-    if(scroll > document.getElementById('languages').offsetTop - 500) {
-        document.querySelectorAll('.lbar-fill').forEach(bar => bar.style.width = bar.parentElement.previousElementSibling.innerText === 'JavaScript' ? '90%' : '75%');
+/* ── SCROLL ── */
+const sb=document.getElementById('scrollbar'),nav=document.getElementById('main-nav');
+window.addEventListener('scroll',()=>{
+  sb.style.width=(scrollY/(document.body.scrollHeight-innerHeight)*100).toFixed(1)+'%';
+  nav.classList.toggle('scrolled',scrollY>60);
+});
+
+/* ── REVEAL ── */
+const ro=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:.08});
+document.querySelectorAll('.reveal,.reveal-left').forEach(el=>ro.observe(el));
+
+/* ── TERMINAL LINES ── */
+document.querySelectorAll('.t-line').forEach((el,i)=>{
+  setTimeout(()=>{el.style.opacity=1},300+i*100);
+});
+
+/* ── COUNTER ── */
+function count(el,target){
+  if(!el)return;
+  let cur=0;const step=target/55;
+  const t=setInterval(()=>{cur=Math.min(cur+step,target);el.textContent=Math.floor(cur);if(cur>=target)clearInterval(t)},16);
+}
+
+/* ── LANG COLOR ── */
+const LC={'JavaScript':'#f1e05a','TypeScript':'#2b7489','Python':'#3572A5','HTML':'#e34c26','CSS':'#563d7c','Java':'#b07219','C++':'#f34b7d','C':'#555','Go':'#00ADD8','Rust':'#dea584','Ruby':'#701516','PHP':'#4F5D95','Shell':'#89e051','Swift':'#ffac45','Kotlin':'#F18E33','Vue':'#41b883','SCSS':'#c6538c','Jupyter Notebook':'#DA5B0B'};
+const lc=l=>LC[l]||'#4e4a46';
+
+/* ── GITHUB API ── */
+const GH='arafat-suhail-dar';
+async function loadGitHub(){
+  try{
+    const pr=await fetch(`https://api.github.com/users/${GH}`);
+    const p=await pr.json();
+
+    count(document.getElementById('s-repos'),p.public_repos);
+    count(document.getElementById('s-followers'),p.followers);
+    count(document.getElementById('gr-repos'),p.public_repos);
+    count(document.getElementById('gr-followers'),p.followers);
+    count(document.getElementById('gr-following'),p.following);
+
+    const joined=new Date(p.created_at).toLocaleDateString('en-US',{year:'numeric',month:'long'});
+    document.getElementById('info-joined').textContent=joined;
+    document.getElementById('info-loc').textContent=p.location||'🌍 Earth';
+    const blogEl=document.getElementById('info-blog');
+    if(p.blog)blogEl.innerHTML=`<a href="${p.blog}" target="_blank" style="color:var(--orange)">${p.blog} ↗</a>`;
+    else blogEl.textContent='—';
+    document.getElementById('info-bio').textContent=p.bio||'Building in the open.';
+    if(!p.bio)document.getElementById('info-bio-row').style.display='none';
+
+    const av=document.getElementById('gr-avatar');if(av)av.src=p.avatar_url;
+    const sn=document.getElementById('gr-name');if(sn)sn.textContent=p.name||p.login;
+    const ss=document.getElementById('gr-since');
+    const js=new Date(p.created_at).toLocaleDateString('en-US',{year:'numeric',month:'short'});
+    if(ss)ss.textContent=`Member since ${js} · ${p.public_repos} repos`;
+
+    const rr=await fetch(`https://api.github.com/users/${GH}/repos?sort=updated&per_page=100`);
+    const repos=await rr.json();
+
+    let stars=0,forks=0;
+    repos.forEach(r=>{stars+=r.stargazers_count;forks+=r.forks_count});
+    count(document.getElementById('s-stars'),stars);
+    count(document.getElementById('s-forks'),forks);
+    count(document.getElementById('gr-stars'),stars);
+
+    // TOP REPOS
+    const top=[...repos].sort((a,b)=>b.stargazers_count-a.stargazers_count||new Date(b.updated_at)-new Date(a.updated_at)).slice(0,6);
+    const grid=document.getElementById('proj-grid');
+    grid.innerHTML='';
+    top.forEach(repo=>{
+      const upd=new Date(repo.updated_at).toLocaleDateString('en-US',{month:'short',year:'numeric'});
+      const card=document.createElement('div');
+      card.className='repo-card reveal';
+      card.innerHTML=`
+        <div class="repo-head">
+          <div class="repo-name">${repo.name}</div>
+          <span class="repo-arrow">↗</span>
+        </div>
+        <div class="repo-desc">${repo.description||'No description provided.'}</div>
+        <div class="repo-meta">
+          ${repo.language?`<div class="repo-lang"><div class="ldot" style="background:${lc(repo.language)}"></div>${repo.language}</div>`:''}
+          <span class="repo-stars">⭐ ${repo.stargazers_count}</span>
+          <span class="repo-forks">🔀 ${repo.forks_count}</span>
+        </div>
+        <div class="repo-updated">Updated ${upd}</div>`;
+      card.addEventListener('click',()=>window.open(repo.html_url,'_blank'));
+      grid.appendChild(card);
+      requestAnimationFrame(()=>ro.observe(card));
+    });
+
+    // LANGUAGES
+    const lmap={};
+    repos.forEach(r=>{if(r.language)lmap[r.language]=(lmap[r.language]||0)+1});
+    const sl=Object.entries(lmap).sort((a,b)=>b[1]-a[1]).slice(0,8);
+    const tot=sl.reduce((s,[,c])=>s+c,0);
+
+    const ce=document.getElementById('langs-chart');
+    if(ce&&sl.length){
+      const segs=sl.map(([l,c])=>({l,c,p:Math.round(c/tot*100),col:lc(l)}));
+      const strip=segs.map(s=>`<div title="${s.l}: ${s.p}%" style="flex:${s.c};background:${s.col};height:100%"></div>`).join('');
+      const legend=segs.map(s=>`<div style="display:flex;align-items:center;gap:6px"><div style="width:8px;height:8px;border-radius:50%;background:${s.col};flex-shrink:0"></div><span style="font-family:'Space Mono',monospace;font-size:.66rem;color:#bdb8b2">${s.l}</span><span style="font-family:'Space Mono',monospace;font-size:.62rem;color:#4e4a46">${s.p}%</span></div>`).join('');
+      ce.innerHTML=`<div style="font-family:'Space Mono',monospace;font-size:.62rem;color:#4e4a46;letter-spacing:.12em;text-transform:uppercase;margin-bottom:13px">Most Used Languages</div><div style="display:flex;height:7px;overflow:hidden;gap:1px;margin-bottom:16px">${strip}</div><div style="display:flex;flex-wrap:wrap;gap:9px 16px">${legend}</div>`;
     }
-  });
 
-  // TYPEWRITER
-  const words = ["Developer", "Engineer", "Designer", "Problem Solver"];
-  let i = 0, j = 0, isDel = false;
-  function type() {
-    const target = document.getElementById('typewriter');
-    const full = words[i];
-    target.innerText = isDel ? full.substring(0, j--) : full.substring(0, j++);
-    if (!isDel && j > full.length) { isDel = true; setTimeout(type, 2000); }
-    else if (isDel && j === 0) { isDel = false; i = (i + 1) % words.length; setTimeout(type, 500); }
-    else setTimeout(type, isDel ? 50 : 150);
+    const mx2=sl[0]?.[1]||1;
+    const be=document.getElementById('lang-bars');
+    be.innerHTML='';
+    sl.forEach(([lang,cnt])=>{
+      const p=Math.round(cnt/mx2*100);
+      const row=document.createElement('div');
+      row.className='lbar-row';
+      row.innerHTML=`<div class="lbar-label"><span>${lang}</span><span>${cnt} repo${cnt>1?'s':''}</span></div><div class="lbar-track"><div class="lbar-fill" style="background:${lc(lang)};width:${p}%"></div></div>`;
+      be.appendChild(row);
+    });
+    const lo=new IntersectionObserver(entries=>{
+      entries.forEach(e=>{if(e.isIntersecting){e.target.querySelectorAll('.lbar-fill').forEach(f=>f.style.transform='scaleX(1)');lo.unobserve(e.target)}});
+    },{threshold:.25});
+    lo.observe(be);
+
+    // SKILLS
+    const sw=document.getElementById('skills-wrap');
+    sw.innerHTML='';
+    const pills=['Git','GitHub','Open Source','REST APIs','Problem Solving'];
+    sl.slice(0,7).forEach(([l])=>pills.unshift(l));
+    [...new Set(pills)].slice(0,14).forEach(p=>{
+      const s=document.createElement('span');s.className='skill-pill';s.textContent=p;sw.appendChild(s);
+    });
+
+  }catch(err){
+    console.error('GitHub fetch error:',err);
+    document.getElementById('proj-grid').innerHTML='<p style="color:var(--muted);font-family:Space Mono,monospace;font-size:.76rem;grid-column:1/-1;padding:20px 0">Could not load repos. GitHub API rate limit may have been reached.</p>';
   }
-  type();
+}
 
-  // GITHUB API
-  async function getGH() {
-    const user = "arafat-suhail-dar";
-    try {
-      const res = await fetch(`https://api.github.com/users/${user}`);
-      const data = await res.json();
-      document.getElementById('s-repos').innerText = data.public_repos;
-      document.getElementById('s-followers').innerText = data.followers;
-      document.getElementById('s-joined').innerText = new Date(data.created_at).getFullYear();
-
-      const repoRes = await fetch(`https://api.github.com/users/${user}/repos?sort=updated&per_page=6`);
-      const repos = await repoRes.json();
-      const grid = document.getElementById('repo-grid');
-      grid.innerHTML = "";
-      repos.forEach(r => {
-        grid.innerHTML += `<div class="repo-card" onclick="window.open('${r.html_url}')">
-            <div class="repo-name">${r.name}</div>
-            <p style="font-size:.8rem; color:var(--muted)">${r.description || 'No description'}</p>
-            <div style="margin-top:10px; font-size:.7rem; color:var(--orange)">${r.language || 'Code'}</div>
-        </div>`;
-      });
-    } catch(e) { console.log("API Error", e); }
+/* ── TYPEWRITER ── */
+(function(){
+  const el=document.getElementById('typewriter');if(!el)return;
+  const words=['Developer','Open Source Builder','Problem Solver','UI/UX Enthusiast','Code Artist','Web Developer','Creative Coder'];
+  let wi=0,ci=0,del=false;
+  function tick(){
+    const w=words[wi];
+    if(!del){el.textContent=w.slice(0,ci+1);ci++;if(ci===w.length){del=true;setTimeout(tick,1900);return}}
+    else{el.textContent=w.slice(0,ci-1);ci--;if(ci===0){del=false;wi=(wi+1)%words.length}}
+    setTimeout(tick,del?38:82);
   }
-  getGH();
+  tick();
+})();
 
-  // REVEAL
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => { if(entry.isIntersecting) entry.target.classList.add('visible'); });
-  }, { threshold: 0.1 });
-  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+/* ── CONTACT FORM ── */
+function handleForm(){
+  const n=document.getElementById('cf-name').value;
+  const e=document.getElementById('cf-email').value;
+  const s=document.getElementById('cf-subject').value;
+  const m=document.getElementById('cf-msg').value;
+  if(!n||!e||!m){alert('Please fill in all required fields.');return}
+  window.location.href=`mailto:arafatsuhaildar@gmail.com?subject=${encodeURIComponent(s||'Portfolio Contact')}&body=${encodeURIComponent(`Name: ${n}\nEmail: ${e}\n\n${m}`)}`;
+}
+
+loadGitHub();
 </script>
-
 </body>
 </html>
