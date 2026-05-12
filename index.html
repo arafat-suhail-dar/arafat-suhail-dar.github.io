@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+LUXURY<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
@@ -272,45 +272,7 @@
       animation: blink 1s step-end infinite;
     }
 
-    /* ── STATS BAND ── */
-    #stats-band {
-      padding: 56px 8vw;
-      border-top: 1px solid rgba(0,207,255,0.1);
-      border-bottom: 1px solid rgba(0,207,255,0.1);
-      background: var(--bg-card);
-      display: block;
-    }
-    .stats-band-label {
-      text-align: center; font-family: var(--mono);
-      font-size: 0.72rem; color: var(--text-muted);
-      letter-spacing: 0.2em; text-transform: uppercase;
-      margin-bottom: 36px;
-    }
-    .stats-band-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; }
-    .sband-card {
-      background: var(--bg-card2); padding: 32px 20px; text-align: center;
-      position: relative; overflow: hidden;
-      transition: background 0.3s, transform 0.3s;
-      border-radius: 0;
-    }
-    .sband-card:first-child { border-radius: 14px 0 0 14px; }
-    .sband-card:last-child { border-radius: 0 14px 14px 0; }
-    .sband-card::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-      transform: scaleX(0); transform-origin: left;
-      transition: transform 0.4s ease;
-    }
-    .sband-card:hover { background: rgba(0,207,255,0.06); transform: translateY(-3px); }
-    .sband-card:hover::before { transform: scaleX(1); }
-    .sband-icon { font-size: 1.3rem; margin-bottom: 10px; display: block; }
-    .sband-num {
-      font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 800;
-      color: var(--text); font-family: var(--mono);
-      transition: color 0.3s;
-    }
-    .sband-card:hover .sband-num { color: var(--accent); }
-    .sband-sub { font-size: 0.72rem; color: var(--text-muted); margin-top: 6px; letter-spacing: 0.06em; font-family: var(--mono); }
+    
 
     /* ── GH CARDS ROW ── */
     .gh-row {
@@ -735,6 +697,82 @@
       0%,100% { opacity: 1; transform: scale(1); }
       50%      { opacity: 0.6; transform: scale(1.15); }
     }
+
+    /* ── MOBILE: hide custom cursor & restore default ── */
+    @media (hover: none), (max-width: 768px) {
+      .cursor-dot, .cursor-ring { display: none !important; }
+      body { cursor: auto !important; }
+      a, button { cursor: pointer !important; }
+    }
+
+    /* ── MOBILE RATIO FIXES ── */
+    @media (max-width: 768px) {
+      /* Hero */
+      .hero { padding: 120px 6vw 80px; min-height: 100svh; }
+      .hero h1 { font-size: clamp(2.8rem, 14vw, 5rem); line-height: 0.95; }
+      .hero-greeting { font-size: 0.72rem; letter-spacing: 0.16em; }
+      .typewriter-container { font-size: 1rem; }
+      .hero-desc { font-size: 0.92rem; margin-bottom: 32px; }
+      .hero-btns { gap: 10px; }
+      .btn { padding: 12px 24px; font-size: 0.82rem; }
+      .hero-scroll { bottom: 24px; }
+
+      /* Stats band */
+      #stats-band { padding: 32px 6vw; }
+      .stats-band-grid { grid-template-columns: repeat(2, 1fr); gap: 2px; }
+      .sband-card { padding: 22px 12px; }
+      .sband-num { font-size: 2rem; }
+
+      /* GH row */
+      .gh-row { grid-template-columns: 1fr; padding: 0 6vw 40px; gap: 14px; }
+
+      /* About */
+      #about { padding: 70px 6vw; }
+      .about-grid { grid-template-columns: 1fr; gap: 32px; }
+      .about-img-wrap { max-width: 260px; margin: 0 auto; aspect-ratio: 1; }
+      .about-text-block p { font-size: 0.92rem; }
+      .info-row { padding: 12px 14px; }
+
+      /* Skills */
+      #skills { padding: 70px 6vw; }
+      .skills-layout { grid-template-columns: 1fr; gap: 40px; }
+      .interests-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .interest-card { padding: 18px 14px; }
+
+      /* Section headings */
+      .section-heading { font-size: clamp(2rem, 10vw, 3.5rem); margin-bottom: 32px; }
+      .section-label { font-size: 0.72rem; margin-bottom: 14px; }
+
+      /* Projects */
+      #projects { padding: 70px 6vw; }
+      .projects-grid { grid-template-columns: 1fr; gap: 14px; }
+      .project-card { padding: 22px 18px; }
+      .projects-filter { gap: 8px; margin-bottom: 24px; }
+      .filter-btn { padding: 7px 16px; font-size: 0.78rem; }
+
+      /* Activity */
+      #activity { padding: 70px 6vw; }
+
+      /* Contact */
+      #contact { padding: 70px 6vw; }
+      .contact-container { grid-template-columns: 1fr; gap: 36px; }
+      .contact-info p { font-size: 0.92rem; }
+      input, textarea { padding: 13px 14px; font-size: 0.88rem; }
+      .form-btn { padding: 12px 28px; font-size: 0.82rem; width: 100%; text-align: center; justify-content: center; }
+
+      /* Footer */
+      footer { padding: 28px 6vw; flex-direction: column; gap: 8px; text-align: center; font-size: 0.78rem; }
+
+      /* Glitch — reduce intensity on mobile */
+      .glitch::before, .glitch::after { display: none; }
+      body::before { display: none; }
+    }
+
+    @media (max-width: 400px) {
+      .hero h1 { font-size: clamp(2.2rem, 13vw, 3rem); }
+      .stats-band-grid { grid-template-columns: repeat(2, 1fr); }
+      .sband-num { font-size: 1.6rem; }
+    }
   </style>
 </head>
 <body>
@@ -831,21 +869,10 @@
       </div>
     </section>
 
-    <!-- STATS BAND -->
-    <div id="stats-band">
-      <div class="stats-band-label">// github_metrics — live · arafat-suhail-dar</div>
-      <div class="stats-band-grid">
-        <div class="sband-card"><span class="sband-icon">📦</span><div class="sband-num" id="s-repos">—</div><div class="sband-sub">Public Repos</div></div>
-        <div class="sband-card"><span class="sband-icon">⭐</span><div class="sband-num" id="s-stars">—</div><div class="sband-sub">Total Stars</div></div>
-        <div class="sband-card"><span class="sband-icon">👥</span><div class="sband-num" id="s-followers">—</div><div class="sband-sub">Followers</div></div>
-        <div class="sband-card"><span class="sband-icon">🔀</span><div class="sband-num" id="s-forks">—</div><div class="sband-sub">Total Forks</div></div>
-      </div>
-    </div>
-
-    <!-- GH STATS ROW -->
+    <!-- GITHUB STATS -->
     <div class="gh-row reveal">
       <div class="gh-rendered">
-        <div class="gh-rlabel">GitHub Stats · arafat-suhail-dar</div>
+        <div class="gh-rlabel">// github_metrics — live · arafat-suhail-dar</div>
         <div class="gh-grid">
           <div class="gh-cell"><div class="gh-cell-icon">📦</div><div class="gh-cell-num" id="gr-repos">—</div><div class="gh-cell-label">Public Repos</div></div>
           <div class="gh-cell"><div class="gh-cell-icon">⭐</div><div class="gh-cell-num" id="gr-stars">—</div><div class="gh-cell-label">Stars Earned</div></div>
@@ -859,9 +886,9 @@
         </div>
       </div>
       <div class="gh-card">
-        <img src="https://streak-stats.demolab.com?user=arafat-suhail-dar&theme=dark&background=#110a0a00&ring=00cfff&fire=0066ff&currStreakLabel=00cfff&sideLabels=8a7a9a&border=ffffff10&dates=8a7a9a&stroke=ffffff10"
+        <img src="https://streak-stats.demolab.com?user=arafat-suhail-dar&theme=dark&background=050c1800&ring=00cfff&fire=0066ff&currStreakLabel=00cfff&sideLabels=7a8a9a&border=00cfff20&dates=7a8a9a&stroke=00cfff10"
           alt="GitHub Streak" loading="lazy"
-          onerror="this.onerror=null;this.src='https://github-readme-streak-stats-nine-omega.vercel.app?user=arafat-suhail-dar&theme=dark&background=#110a0a00&ring=00cfff&fire=0066ff'"/>
+          onerror="this.onerror=null;this.src='https://github-readme-streak-stats-nine-omega.vercel.app?user=arafat-suhail-dar&theme=dark&background=050c1800&ring=00cfff&fire=0066ff'"/>
       </div>
     </div>
 
@@ -1003,10 +1030,11 @@
 
   <script>
     /* ── CURSOR ── */
+    const isTouch = window.matchMedia('(hover: none)').matches || 'ontouchstart' in window;
     const dot = document.getElementById('cursorDot');
     const ring = document.getElementById('cursorRing');
     let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
-    document.addEventListener('mousemove', e => {
+    if (!isTouch) document.addEventListener('mousemove', e => {
       mouseX = e.clientX; mouseY = e.clientY;
       dot.style.left = mouseX - 4 + 'px';
       dot.style.top = mouseY - 4 + 'px';
@@ -1179,10 +1207,6 @@
         // Stats band
         const stars = repos.reduce((a, r) => a + (r.stargazers_count || 0), 0);
         const forks = repos.reduce((a, r) => a + (r.forks_count || 0), 0);
-        count(document.getElementById('s-repos'), profile.public_repos);
-        count(document.getElementById('s-stars'), stars);
-        count(document.getElementById('s-followers'), profile.followers);
-        count(document.getElementById('s-forks'), forks);
         count(document.getElementById('gr-repos'), profile.public_repos);
         count(document.getElementById('gr-stars'), stars);
         count(document.getElementById('gr-followers'), profile.followers);
@@ -1334,4 +1358,4 @@
   </script>
 
 </body>
-</html>
+          </html>
